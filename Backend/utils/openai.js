@@ -28,8 +28,9 @@ export const getOpenAIAPIResponse = async (message) =>{
 
     } catch (error) {
         console.error(error.response?.data || error.message);
-        res.status(500).json({
-            error: "Something went wrong"
-        });
+        // res.status(500).json({
+        //     error: "Something went wrong"
+        // });
+        throw error;
     }
 };  

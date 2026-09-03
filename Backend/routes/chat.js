@@ -1,6 +1,7 @@
 import express from "express";
 import Thread from "../models/Thread.js";
 import {getOpenAIAPIResponse} from "../utils/openai.js";
+import auth from "../middleware/auth.js";
 
 const router = express.Router();
 
@@ -21,7 +22,7 @@ router.post("/test", async(req, res) => {
 });
 
 //Get all threads
-router.get("/thread", async(req, res) => {
+router.get("/thread",auth, async(req, res) => {
     try {
         const threads = await Thread.find({}).sort({updatedAt: -1});
         //most recent data on top
@@ -32,7 +33,7 @@ router.get("/thread", async(req, res) => {
     }
 });
 
-router.get("/thread/:threadId", async(req, res) => {
+router.get("/thread/:threadId", auth,async(req, res) => {
     const {threadId} = req.params;
 
     try {
@@ -47,7 +48,7 @@ router.get("/thread/:threadId", async(req, res) => {
     }
 });
 
-router.delete("/thread/:threadId", async (req, res) => {
+router.delete("/thread/:threadId",auth, async (req, res) => {
     const {threadId} = req.params;
     try {
         const deletedThread = await Thread.findOneAndDelete({threadId});
@@ -63,7 +64,7 @@ router.delete("/thread/:threadId", async (req, res) => {
     }
 });
 
-router.post("/chat", async(req, res) => {
+router.post("/chat",auth,async(req, res) => {
     const {threadId, message} = req.body;
     if(!threadId || !message) {
         res.status(400).json({error: "Missing Required Fields"});
@@ -74,6 +75,7 @@ router.post("/chat", async(req, res) => {
             thread = new Thread({
                 threadId,
                 title: message,
+                userId: req.userId,
                 messages: [{role: "user", content: message}]
             });
         } else {

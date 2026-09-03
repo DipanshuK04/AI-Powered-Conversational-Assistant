@@ -10,6 +10,7 @@ function ChatWindow() {
     const [isOpen, setIsOpen] = useState(false);
 
     const getReply = async () => {
+        if(prompt=='') return;
         setLoading(true);
         setNewChat(false);
 
@@ -17,7 +18,8 @@ function ChatWindow() {
         const options = {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("token")}`
             },
             body: JSON.stringify({
                 message: prompt,
@@ -57,7 +59,10 @@ function ChatWindow() {
     const handleProfileClick = () => {
         setIsOpen(!isOpen);
     }
-
+    const logout = () => {
+        localStorage.removeItem("token");
+        window.location.reload();
+    };
     return (
         <div className="chatWindow">
             <div className="navbar">
@@ -71,7 +76,7 @@ function ChatWindow() {
                 <div className="dropDown">
                     <div className="dropDownItem"><i class="fa-solid fa-gear"></i> Settings</div>
                     <div className="dropDownItem"><i class="fa-solid fa-cloud-arrow-up"></i> Upgrade plan</div>
-                    <div className="dropDownItem"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log out</div>
+                    <div className="dropDownItem" onClick={logout}><i class="fa-solid fa-arrow-right-from-bracket"></i> Log out</div>
                 </div>
             }
             <Chat>
@@ -87,7 +92,7 @@ function ChatWindow() {
                     <input placeholder="Ask anything"
                         value={prompt}
                         onChange={(e) => setPrompt(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter'? getReply() : ''}
+                        onKeyDown={(e) => e.key === 'Enter' ? getReply() : ''}
                     >
                            
                     </input>
